@@ -1,0 +1,12 @@
+.container {
+    width: 700px;
+    text-align: justify;
+}
+
+.date {
+    font-weight: bold;
+}
+
+.name {
+    font-size: 12pt;
+}

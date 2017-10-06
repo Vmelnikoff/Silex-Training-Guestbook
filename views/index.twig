@@ -1,0 +1,26 @@
+{% extends 'layouts/layout.inc.twig' %}
+
+{% block title %}Training guest book - Главная страница{% endblock %}
+{% block description %}Описание сайта для SEO{% endblock %}
+{% block keywords %}Ключевые слова для SEO{% endblock %}
+
+{% block content %}
+
+    <div class="starter-template">
+        <h1>Training guest book</h1>
+        <p><a href="/add">Добавить отзыв</a></p>
+        <p><a href="?sort=date">Сортировать по дате отзыва</a> | <a href="?sort=likes">Сортировать по кол-ву голосов</a></p>
+    </div>
+
+    {% for note in notes %}
+        <div class="note">
+            <p>
+                <span class="date">{{ note.date }}</span>
+                <span class="name">{{ note.name }}</span>
+            </p>
+            <p>{{ note.note }}<a href="/note/{{ note.id }}">Подробнее</a></p>
+            <p>{{ note.likes }} голосов - <a href="?action=vote">Проголосовать</a></p>
+        </div>
+    {% endfor %}
+
+{% endblock %}
