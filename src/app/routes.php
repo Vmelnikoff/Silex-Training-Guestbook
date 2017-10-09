@@ -19,6 +19,32 @@ $app->get('/add', function () use ($app) {
     return $app['twig']->render('form.twig');
 });
 
+$app->post('/add', function () use ($app) {
+
+    $name = $_POST['name'];
+    $note = strip_tags($_POST['text']);
+    if (!empty($_SERVER['HTTP_CLIENT_IP']))
+    {
+        $ip=$_SERVER['HTTP_CLIENT_IP'];
+    }
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+    {
+        $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    else
+    {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+
+    $sql = "INSERT INTO reviews (name, note, date, ip) VALUES (?, ?, CURDATE(), INET_ATON('$ip'))";
+    $stmt = $app['db']->prepare($sql);
+    $stmt->bindValue(1, $name);
+    $stmt->bindValue(2, $note);
+    $stmt->execute();
+
+    return $app['twig']->render('form-success.twig');
+});
+
 $app->get('/note/{id}', function ($id) use ($app) {
 
     $sql = 'SELECT * FROM reviews WHERE id = ?';
