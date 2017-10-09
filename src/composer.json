@@ -3,7 +3,8 @@
     "silex/silex": "~2.0",
     "twig/twig": "^2.4",
     "doctrine/dbal": "^2.5",
-    "vlucas/phpdotenv": "^2.4"
+    "vlucas/phpdotenv": "^2.4",
+    "symfony/validator": "^3.3"
   },
   "autoload": {
     "psr-4": {
