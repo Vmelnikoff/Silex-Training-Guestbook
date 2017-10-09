@@ -7,6 +7,10 @@ $dotenv->load();
 
 $app = new Silex\Application(['debug' => getenv('APP_DEBUG')]);
 
+$app->register(new Silex\Provider\SessionServiceProvider, [
+    'session.storage.save_path' => __DIR__ . '/../../tmp/sessions'
+]);
+
 $app->register(new Silex\Provider\TwigServiceProvider(), [
     'twig.path' => __DIR__ . '/../../views',
     'twig.options' => ['cache' => false],  // на продакшене установить __DIR__ . '/../../cache']

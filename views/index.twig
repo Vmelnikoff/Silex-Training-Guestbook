@@ -9,7 +9,14 @@
     <div class="starter-template">
         <h1>Training guest book</h1>
         <p><a href="/add">Добавить отзыв</a></p>
-        <p><a href="?sort=date">Сортировать по дате отзыва</a> | <a href="?sort=likes">Сортировать по кол-ву голосов</a></p>
+
+        <form action="" method="post">
+        <button type="submit" name="sortdate" value="{{ sortdate }}">Сортировать по дате отзыва</button>
+        </form>
+        <form action="" method="post">
+        <button type="submit" name="sortvote" value="{{ sortvote }}">Сортировать по кол-ву голосов</button>
+        </form>
+
     </div>
 
     {% for note in notes %}
@@ -19,7 +26,7 @@
                 <span class="name">{{ note.name }}</span>
             </p>
             <p>{{ note.note }}<a href="/note/{{ note.id }}">Подробнее</a></p>
-            <p>{{ note.likes }} голосов - <a href="?action=vote">Проголосовать</a></p>
+            <p>{{ note.likes }} голосов - <a href="/vote/{{ note.id }}">Проголосовать</a></p>
         </div>
     {% endfor %}
 
