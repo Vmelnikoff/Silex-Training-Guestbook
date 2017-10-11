@@ -3,15 +3,12 @@
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use App\Models\Reviews;
 
 $app->get('/', function () use ($app) {
 
-    $notes = $app['db']->fetchAll('SELECT * FROM reviews');
-
-    $cnt = count($notes);
-    for ($i = 0; $i < $cnt; $i++) {
-        $notes[$i]['note'] = substr($notes[$i]['note'], 0, 256) . '...';
-    }
+    $reviews = new Reviews($app);
+    $notes = $reviews->mainPage();
 
     return $app['twig']->render('index.twig', [
         'notes' => $notes, 'sortvote' => 'DESC', 'sortdate' => 'DESC',
@@ -32,14 +29,8 @@ $app->post('/', function () use ($app) {
         $sortvote = 'ASC';
     }
 
-    $sql = 'SELECT * FROM reviews' . $orderby;
-    $notes = $app['db']->fetchAll($sql);
-
-    $cnt = count($notes);
-    for ($i = 0; $i < $cnt; $i++) {
-        $notes[$i]['note'] = substr($notes[$i]['note'], 0, 256) . '...';
-    }
-
+    $reviews = new Reviews($app);
+    $notes = $reviews->postMainPage($orderby);
 
     return $app['twig']->render('index.twig', [
         'notes' => $notes, 'sortdate' => $sortdate, 'sortvote' => $sortvote,
@@ -58,9 +49,10 @@ $app->get('/vote/{id}', function ($id) use ($app) {
     }
 
     if ($app['session']->get('user')[$id] != $ip) {
-        $likes = $app['db']->fetchColumn('SELECT likes FROM reviews WHERE id = ?', [(int)$id], 0);
-        $likes++;
-        $app['db']->update('reviews', ['likes' => $likes], ['id' => $id]);
+
+        $reviews = new Reviews($app);
+        $reviews->votePage($id);
+
         $app['session']->set('user', [$id => $ip]);
     }
 
@@ -110,11 +102,8 @@ $app->post('/add', function () use ($app) {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
 
-        $sql = "INSERT INTO reviews (name, note, date, ip) VALUES (?, ?, CURDATE(), INET_ATON('$ip'))";
-        $stmt = $app['db']->prepare($sql);
-        $stmt->bindValue(1, $data['name']);
-        $stmt->bindValue(2, $data['note']);
-        $stmt->execute();
+        $reviews = new Reviews($app);
+        $reviews->postAddPage($ip, $data['name'], $data['note']);
 
         return $app['twig']->render('form-success.twig');
 
@@ -132,8 +121,7 @@ $app->post('/add', function () use ($app) {
 
 $app->get('/note/{id}', function ($id) use ($app) {
 
-    $sql = 'SELECT * FROM reviews WHERE id = ?';
-    $note = $app['db']->fetchAssoc($sql, [(int)$id]);
+
     if ($id == 1) {
         $prev = 1;
     } else {
@@ -145,6 +133,8 @@ $app->get('/note/{id}', function ($id) use ($app) {
         $next = $id;
     }
 
+    $reviews = new Reviews($app);
+    $note = $reviews->notePage($id);
 
     return $app['twig']->render('note.twig', [
         'note' => $note, 'prev' => $prev, 'next' => $next
